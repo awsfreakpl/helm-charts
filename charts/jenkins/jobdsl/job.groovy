@@ -1,35 +1,20 @@
-multibranchPipelineJob(jobProperties.bitbucketRepo.repository) {
-  displayName(jobProperties.bitbucketRepo.repoOwner + "/" + jobProperties.bitbucketRepo.repository)
+multibranchPipelineJob(jobProperties.githubRepo.repository) {
+  displayName(jobProperties.githubRepo.repoOwner + "/" + jobProperties.githubRepo.repository)
   branchSources {
-    branchSource {
-      source {
-        bitbucket {
-          id (jobProperties.bitbucketRepo.repository)
-          serverUrl(jobProperties.bitbucketRepo.serverUrl)
-          repoOwner(jobProperties.bitbucketRepo.repoOwner)
-          repository(jobProperties.bitbucketRepo.repository)
-          credentialsId(jobProperties.bitbucketRepo.credentialsId)
-          traits {
-            localBranchTrait()
-            sshCheckoutTrait {
-              credentialsId(jobProperties.gitRepo.credentialsId)
-            }
-            headWildcardFilter {
-              includes(jobProperties.branchDiscoveryIncludes)
-              excludes(jobProperties.branchDiscoveryExcludes)
-            }
-          }
+    github {
+      credentialsId(jobProperties.githubRepo.credentialsId)
+      repoOwner(jobProperties.githubRepo.repoOwner)
+      repository(jobProperties.githubRepo.repository)
+      id (jobProperties.githubRepo.repository)
+      apiUri(jobProperties.githubRepo.apiUri)
+      traits {
+        localBranchTrait()
+        sshCheckoutTrait {
+          credentialsId(jobProperties.gitRepo.credentialsId)
         }
-      }
-      buildStrategies {
-        buildNamedBranches {
-          filters {
-            wildcards {
-              caseSensitive(true)
-              includes(jobProperties.branchPushTriggerIncludes)
-              excludes(jobProperties.branchPushTriggerExcludes)
-            }
-          }
+        headWildcardFilter {
+          includes(jobProperties.branchDiscoveryIncludes)
+          excludes(jobProperties.branchDiscoveryExcludes)
         }
       }
     }
@@ -41,7 +26,7 @@ multibranchPipelineJob(jobProperties.bitbucketRepo.repository) {
   }
   configure {
     def traits = it / sources / data / 'jenkins.branch.BranchSource' / source / traits
-    traits << 'com.cloudbees.jenkins.plugins.bitbucket.BranchDiscoveryTrait' {
+    traits << 'org.jenkinsci.plugins.github_branch_source.BranchDiscoveryTrait' {
       strategyId(3)
     }
   }
